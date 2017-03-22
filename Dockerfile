@@ -5,7 +5,7 @@ MAINTAINER Kuo-tung Kao
 RUN apt-get update && \
     apt-get install -y --force-yes git fish python-pip vim libssl-dev
 
-RUN git clone https://github.com/openstack/kolla-ansible /kolla-ansible && \
+RUN git clone https://github.com/openstack/kolla-ansible /kolla-ansible -b stable/ocata && \
     pip install -r /kolla-ansible/requirements.txt && \
     pip install --upgrade pip && \
     pip install ansible
