@@ -10,7 +10,7 @@ RUN git clone https://github.com/openstack/kolla-ansible /kolla-ansible -b stabl
     pip install --upgrade pip && \
     pip install ansible
 
-ADD deploy.sh /bin/deploy
+ADD deploy.sh /bin/ka
 ADD inventory /inventory
 
 RUN chmod +x /bin/deploy
