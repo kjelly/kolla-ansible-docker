@@ -13,6 +13,7 @@ RUN pip install -r /kolla-ansible/requirements.txt && \
 
 ADD deploy.sh /bin/ka
 ADD inventory /inventory
+ADD kolla-prepare /kolla-prepare
 
 RUN chmod +x /bin/ka
 
