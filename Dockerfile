@@ -14,8 +14,10 @@ RUN pip install -r /kolla-ansible/requirements.txt && \
 ADD deploy.sh /bin/ka
 ADD inventory /inventory
 ADD kolla-prepare /kolla-prepare
+ADD prepare.sh /bin/prepare
 
 RUN chmod +x /bin/ka
+RUN chmod +x /bin/prepare
 
 CMD ["/bin/sleep", "infinity"]
 

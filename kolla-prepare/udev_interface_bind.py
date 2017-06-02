@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
+import sys
 import subprocess
 import json
 
 UDEV_PATH = '.'
 
 
-TEMPLATE = ('SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*",' 
+TEMPLATE = ('SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*",'
            'ATTR{address}=="%s", ATTR{type}=="1", KERNEL=="*", NAME="%s"\n')
 
 
 def get_host_info():
-    with open('mac_map.json', 'r') as ftr:
+    with open(sys.argv[1], 'r') as ftr:
         return json.load(ftr)
 
 

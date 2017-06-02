@@ -1,6 +1,18 @@
 - name: prepare kolla
   hosts: "all"
   tasks:
+
+  - copy: src=/etc/kolla-ansible-docker/rename_rules.json dest=/tmp/rename_rules.json
+  - script: /kolla-prepare/udev_interface_bind.py /tmp/rename_rules.json
+
+  - copy: src=/kolla-prepare/inwin-post-boot.service dest=/etc/systemd/system/
+  - file: path=/opt/InwinSTACK/ state=directory
+  - file: path=/etc/inwin/post-boot-scripts state=directory
+  - copy: src=/kolla-prepare/inwin-post-boot.py dest=/opt/InwinSTACK/ mode=0755
+  - copy: src=/kolla-prepare/ifup.py dest=/opt/InwinSTACK/ mode=0755
+
+
+
   - lineinfile: path=/etc/ssh/sshd_config line="UseDNS no"
   - systemd: name="sshd" state="restarted" daemon_reload=yes
 
@@ -8,10 +20,11 @@
     with_items:
     - libvirt-daemon
     - openvswitch
+    when: ansible_os_family == "RedHat"
 
   - name: Gather facts
     setup:
-  
+
   - name: Ensure localhost in /etc/hosts
     lineinfile:
       dest: /etc/hosts
@@ -19,12 +32,12 @@
       line: "127.0.0.1 localhost"
       state: present
     become: True
-  
+
   - name: Generate /etc/hosts for all of the nodes
     blockinfile:
       dest: /etc/hosts
       marker: "# {mark} ANSIBLE GENERATED HOSTS"
-      block: |                                                                                                                           
+      block: |
           {% for host in groups['all'] %}
           {{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }} {{ hostvars[host]['ansible_hostname'] }}
             {% endfor %}
