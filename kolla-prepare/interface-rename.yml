@@ -11,26 +11,7 @@
   - copy: src=/kolla-prepare/inwin-post-boot.py dest=/opt/InwinSTACK/ mode=0755
   - copy: src=/kolla-prepare/ifup.py dest=/opt/InwinSTACK/ mode=0755
 
-  - copy: src=/packages/ dest=/packages/ mode=0755
-  - unarchive:
-      src: /packages/docker-py.tar.gz
-      dest: /tmp
 
-  - shell: easy_install --always-unzip --allow-hosts=None --find-links=/packages .
-    args:
-        chdir: /tmp/docker-py/
-
-  - name: copy docker rpm
-    copy: src=/packages/docker-engine-1.12.0-1.el7.centos.x86_64.rpm dest=/tmp/docker-engine.rpm
-    when: ansible_os_family == "RedHat"
-
-  - name: install docker-selinux
-    yum: name={{ item }} state=present
-    when: ansible_os_family == "RedHat"
-    with_items:
-        - /packages/docker-engine-selinux-1.13.1-1.el7.centos.noarch.rpm
-        - /tmp/docker-engine.rpm
-        - /packages/deltarpm-3.6-3.el7.x86_64.rpm
 
   - lineinfile: path=/etc/ssh/sshd_config line="UseDNS no"
   - systemd: name="sshd" state="restarted" daemon_reload=yes

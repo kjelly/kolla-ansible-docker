@@ -11,6 +11,8 @@ RUN pip install -r /kolla-ansible/requirements.txt && \
     pip install --upgrade pip && \
     pip install ansible
 
+ADD packages /packages
+
 ADD deploy.sh /bin/ka
 ADD inventory /inventory
 ADD kolla-prepare /kolla-prepare
