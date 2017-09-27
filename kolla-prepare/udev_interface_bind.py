@@ -8,7 +8,7 @@ UDEV_PATH = '.'
 
 
 TEMPLATE = ('SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*",'
-           'ATTR{address}=="%s", ATTR{type}=="1", KERNEL=="*", NAME="%s"\n')
+            'ATTR{address}=="%s", ATTR{type}=="1", KERNEL=="*", NAME="%s"\n')
 
 
 def get_host_info():
@@ -18,10 +18,13 @@ def get_host_info():
 
 def get_all_mac_address():
     ret = []
-    output = subprocess.check_output("sudo ip l", shell=True).strip().split('\n')
+    output = subprocess.check_output("sudo ip l",
+                                     shell=True).strip().split('\n')
     for i in xrange(0, len(output), 2):
         first_line = output[i].strip().split(':')
-        second_line = output[i+1].strip().split(' ')
+        second_line = output[i + 1].strip().split(' ')
+        if len(second_line) < 2:
+            continue
         mac = second_line[1]
         ret.append(mac)
     return ret

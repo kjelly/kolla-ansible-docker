@@ -1,0 +1,9 @@
+- name: post add compute node
+  hosts: "compute"
+  tasks:
+
+  - name: restart libvirt container
+    command: sudo docker restart nova_libvirt
+
+  - name: restart compute container
+    command: sudo docker restart nova_compute
