@@ -1,2 +1,2 @@
 #!/bin/bash
-./config.sh kolla $@
+./_config.sh kolla $@
