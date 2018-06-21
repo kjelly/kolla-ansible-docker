@@ -21,10 +21,13 @@ ADD scripts /scripts
 RUN cp /scripts/* /bin/ && \
     mv /bin/deploy.sh /bin/ka && \
     mv /bin/kolla_prepare.sh /bin/prepare && \
+    mv /bin/inwin.sh /bin/inwin && \
     mv /bin/kolla_post_add_compute_node.sh /bin/post_add_compute_node && \
     chmod +x /bin/ka && \
     chmod +x /bin/prepare && \
     chmod +x /bin/post_add_compute_node
+    chmod +x /bin/inwin
+
 
 
 
