@@ -1,0 +1,12 @@
+- name: update haproxy pem
+  hosts: "control"
+  tasks:
+
+  - name: copy haproxy pem
+    copy: src=/etc/kolla/certificates/haproxy.pem dest=/etc/kolla/haproxy.pem
+    become: yes
+
+  - name: restart haproxy container
+    shell: docker restart haproxy
+    become: yes
+

@@ -11,6 +11,9 @@
   - copy: src=/kolla-prepare/inwin-post-boot.py dest=/opt/InwinSTACK/ mode=0755
   - copy: src=/kolla-prepare/ifup.py dest=/opt/InwinSTACK/ mode=0755
 
+  - shell: systemctl enable inwin-post-boot.service
+    become: yes
+
   - copy: src=/packages/ dest=/packages/ mode=0755
   - unarchive:
       src: /packages/docker-py.tar.gz
@@ -51,6 +54,19 @@
       line: "127.0.0.1 localhost"
       state: present
     become: True
+
+  - name: remove "localdomain" from hostname
+    lineinfile: path=/etc/hostname  regexp='^(.+)\.localdomain$' line="\1" backrefs=yes
+    become: yes
+
+  - name: disable auto update hostname
+    lineinfile: path=/etc/cloud/cloud.cfg  regexp='(- set_hostname)' line="#\1" backrefs=yes
+    become: yes
+
+  - name: disable auto update hostname
+    lineinfile: path=/etc/cloud/cloud.cfg  regexp='(- update_hostname)' line="#\1" backrefs=yes
+    become: yes
+
 
   - name: Generate /etc/hosts for all of the nodes
     blockinfile:
