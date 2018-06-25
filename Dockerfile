@@ -3,7 +3,9 @@ MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish python-pip vim libssl-dev libffi-dev
+    apt-get install -y --force-yes git fish python-pip vim libssl-dev libffi-dev curl
+
+RUN curl http://vim.kjelly.tw/init|bash
 
 ADD kolla-ansible /kolla-ansible
 
@@ -25,7 +27,7 @@ RUN cp /scripts/* /bin/ && \
     mv /bin/kolla_post_add_compute_node.sh /bin/post_add_compute_node && \
     chmod +x /bin/ka && \
     chmod +x /bin/prepare && \
-    chmod +x /bin/post_add_compute_node
+    chmod +x /bin/post_add_compute_node && \
     chmod +x /bin/inwin
 
 
