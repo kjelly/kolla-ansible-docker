@@ -3,14 +3,15 @@ MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish python-pip vim libssl-dev libffi-dev curl
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python
 
 RUN curl http://vim.kjelly.tw/init|bash
 
 ADD kolla-ansible /kolla-ansible
 
-RUN pip install -r /kolla-ansible/requirements.txt && \
+RUN curl https://bootstrap.pypa.io/get-pip.py |python - && \
     pip install --upgrade pip && \
+    pip install -r /kolla-ansible/requirements.txt && \
     pip install ansible
 
 ADD ssh-config /root/.ssh
