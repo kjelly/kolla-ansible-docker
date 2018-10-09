@@ -3,9 +3,9 @@ MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python sudo man-db
 
-RUN curl http://vim.kjelly.tw/init|bash
+RUN curl http://vim.kjelly.tw/init|bash && nvim +PlugInstall +qall
 
 ADD kolla-ansible /kolla-ansible
 
