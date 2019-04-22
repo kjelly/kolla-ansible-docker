@@ -1,11 +1,14 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
     apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python sudo man-db
 
-RUN curl http://vim.kjelly.tw/init|bash && nvim +PlugInstall +qall
+RUN curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh|bash && \
+    curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh |bash && \
+    curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash && \
+    nvim +PlugInstall +qall
 
 ADD kolla-ansible /kolla-ansible
 
