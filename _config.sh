@@ -10,4 +10,6 @@ fi
 docker exec -it $NAME-ansible-docker cp /kolla-ansible/etc/kolla/globals.yml /etc/kolla/
 docker exec -it $NAME-ansible-docker cp /kolla-ansible/etc/kolla/passwords.yml /etc/kolla/
 docker exec -it $NAME-ansible-docker cp /inventory /etc/kolla-ansible-docker/
+docker exec -it $NAME-ansible-docker mkdir -p /etc/ansible/
+docker exec -it $NAME-ansible-docker cp /kolla-prepare/ansible.cfg /etc/ansible/
 docker exec -it $NAME-ansible-docker /kolla-ansible/tools/generate_passwords.py
