@@ -3,7 +3,8 @@ MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python sudo man-db iputils-ping net-tools iproute2
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python sudo man-db iputils-ping net-tools iproute2 build-essential && \
+    pip install -y python-openstackclient python-heatclient gnocchiclient
 
 RUN curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh|bash && \
     curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh |bash && \
