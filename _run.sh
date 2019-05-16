@@ -8,4 +8,4 @@ then
 fi
 sudo mkdir -p /etc/$NAME-ansible-docker
 sudo mkdir -p /etc/$NAME
-docker run --restart=always --privileged -d --net=host --name $NAME-ansible-docker -v /etc/$NAME:/etc/kolla -v /etc/$NAME-ansible-docker:/etc/kolla-ansible-docker -v /root/kolla-ansible-container-data:/root kolla-ansible-docker:$1
+docker run --restart=always --privileged -d --net=host --name $NAME-ansible-docker -v /etc/$NAME:/etc/kolla -v /etc/$NAME-ansible-docker:/etc/kolla-ansible-docker -v /root/kolla-ansible-container-data:/root kolla-ansible-docker:$2

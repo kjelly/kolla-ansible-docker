@@ -1,2 +1,2 @@
 #!/bin/bash
-./_run.sh kolla
+./_run.sh kolla $1
