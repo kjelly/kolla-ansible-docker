@@ -2,7 +2,8 @@ FROM ubuntu:18.04
 MAINTAINER Kuo-tung Kao
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python2.7-dev sudo man-db iputils-ping net-tools iproute2 build-essential zsh wget
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python2.7-dev sudo man-db build-essential && \
+    apt-get install -y --force-yes zsh wget mariadb-client influxdb-client iputils-ping net-tools iproute2
 
 RUN cp /usr/bin/python2.7 /usr/bin/python && \
     curl https://bootstrap.pypa.io/get-pip.py |python - && \
