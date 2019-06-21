@@ -3,7 +3,7 @@ MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python-dev sudo man-db iputils-ping net-tools iproute2 build-essential zsh wget && \
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python2.7-dev sudo man-db iputils-ping net-tools iproute2 build-essential zsh wget && \
     curl https://bootstrap.pypa.io/get-pip.py |python - && \
     pip install --upgrade pip && \
     pip install python-openstackclient python-heatclient gnocchiclient
@@ -32,7 +32,6 @@ setopt correct \n \
 PROMPT="%(?.%{${fg[green]}%}.%{${fg[red]}%})%n${reset_color}@${fg[blue]}kolla-ansible${reset_color}(%*%) %~ %# " \
 '>> /root/.zshrc
 
-
 ADD kolla-ansible /kolla-ansible
 
 RUN pip install -r /kolla-ansible/requirements.txt && \
@@ -55,9 +54,13 @@ RUN cp /scripts/* /bin/ && \
     chmod +x /bin/post_add_compute_node && \
     chmod +x /bin/inwin
 
+<<<<<<< HEAD
 
 ENV TERM=xterm-256color
 
 
+=======
+ENV TERM xterm-256color
+>>>>>>> 6083c20ae25d93c0e7f96c6513e67a289ce7d71c
 CMD ["/bin/sleep", "infinity"]
 

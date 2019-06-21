@@ -1,11 +1,16 @@
 # These initial groups are the only groups required to be modified. The
 # additional groups are for more control of the environment.
 [control]
-c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False
+# These hostname must be resolvable from your deployment host
+c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
+# The above can also be specified as follows:
+#control[01:03]     ansible_user=kolla
+
+# The network nodes are where your l3-agent and loadbalancers will run
+# This can be the same as a host in the control group
 [network]
-c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False
-
+c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
 # inner-compute is the groups of compute nodes which do not have
 # external reachability.
@@ -18,24 +23,33 @@ c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc
 # DEPRECATED, the group will be removed in S release of OpenStack,
 # use variable neutron_compute_dvr_mode instead.
 [external-compute]
-c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False
-
+compute01
+c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
 [compute:children]
 inner-compute
 external-compute
 
-[storage]
-c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False
-
-
 [monitoring]
-c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False
+c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
+# When compute nodes and control nodes use different interfaces,
+# you need to comment out "api_interface" and other interfaces from the globals.yml
+# and specify like below:
+#compute01 neutron_external_interface=eth0 api_interface=em1 storage_interface=em1 tunnel_interface=em1
+
+[storage]
+c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
 [deployment]
-c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False
+c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
+[baremetal:children]
+control
+network
+compute
+storage
+monitoring
 
 # You can explicitly specify which hosts run each project by updating the
 # groups in the sections below. Common services are grouped together.
@@ -43,6 +57,7 @@ c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc
 haproxy
 
 [chrony:children]
+control
 network
 compute
 storage
@@ -51,15 +66,18 @@ monitoring
 [collectd:children]
 compute
 
-[baremetal:children]
-control
-
 [grafana:children]
 monitoring
 
 [etcd:children]
 control
 compute
+
+[influxdb:children]
+monitoring
+
+[prometheus:children]
+monitoring
 
 [kafka:children]
 control
@@ -158,17 +176,14 @@ control
 [murano:children]
 control
 
-[ceph:children]
+[solum:children]
 control
 
 [ironic:children]
 control
 
-[influxdb:children]
-monitoring
-
-[prometheus:children]
-monitoring
+[ceph:children]
+control
 
 [magnum:children]
 control
@@ -176,19 +191,10 @@ control
 [sahara:children]
 control
 
-[solum:children]
-control
-
 [mistral:children]
 control
 
 [manila:children]
-control
-
-[panko:children]
-control
-
-[gnocchi:children]
 control
 
 [ceilometer:children]
@@ -200,10 +206,16 @@ control
 [congress:children]
 control
 
+[panko:children]
+control
+
+[gnocchi:children]
+control
+
 [tacker:children]
 control
 
-[vitrage:children]
+[trove:children]
 control
 
 # Tempest
@@ -216,7 +228,7 @@ control
 [vmtp:children]
 control
 
-[trove:children]
+[vitrage:children]
 control
 
 [watcher:children]
@@ -420,16 +432,6 @@ barbican
 [barbican-worker:children]
 barbican
 
-# Trove
-[trove-api:children]
-trove
-
-[trove-conductor:children]
-trove
-
-[trove-taskmanager:children]
-trove
-
 # Heat
 [heat-api:children]
 heat
@@ -483,6 +485,13 @@ magnum
 [magnum-conductor:children]
 magnum
 
+# Sahara
+[sahara-api:children]
+sahara
+
+[sahara-engine:children]
+sahara
+
 # Solum
 [solum-api:children]
 solum
@@ -506,6 +515,16 @@ mistral
 [mistral-engine:children]
 mistral
 
+# Ceilometer
+[ceilometer-central:children]
+ceilometer
+
+[ceilometer-notification:children]
+ceilometer
+
+[ceilometer-compute:children]
+compute
+
 # Aodh
 [aodh-api:children]
 aodh
@@ -518,6 +537,16 @@ aodh
 
 [aodh-notifier:children]
 aodh
+
+# Congress
+[congress-api:children]
+congress
+
+[congress-datasource:children]
+congress
+
+[congress-policy-engine:children]
+congress
 
 # Panko
 [panko-api:children]
@@ -533,32 +562,15 @@ gnocchi
 [gnocchi-metricd:children]
 gnocchi
 
-# Sahara
-[sahara-api:children]
-sahara
+# Trove
+[trove-api:children]
+trove
 
-[sahara-engine:children]
-sahara
+[trove-conductor:children]
+trove
 
-# Ceilometer
-[ceilometer-central:children]
-ceilometer
-
-[ceilometer-notification:children]
-ceilometer
-
-[ceilometer-compute:children]
-compute
-
-# Congress
-[congress-api:children]
-congress
-
-[congress-datasource:children]
-congress
-
-[congress-policy-engine:children]
-congress
+[trove-taskmanager:children]
+trove
 
 # Multipathd
 [multipathd:children]
