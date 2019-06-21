@@ -3,19 +3,39 @@ MAINTAINER Kuo-tung Kao
 
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python sudo man-db iputils-ping net-tools iproute2 build-essential && \
-    pip install -y python-openstackclient python-heatclient gnocchiclient
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python-dev sudo man-db iputils-ping net-tools iproute2 build-essential zsh wget && \
+    curl https://bootstrap.pypa.io/get-pip.py |python - && \
+    pip install --upgrade pip && \
+    pip install python-openstackclient python-heatclient gnocchiclient
 
-RUN curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh|bash && \
-    curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh |bash && \
-    curl https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash && \
-    nvim +PlugInstall +qall
+
+RUN wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh | bash && \
+    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh | bash && \
+    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash  && \
+    nvim.nightly +PlugInstall +qall! || echo ok
+
+
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+
+RUN echo '\n \
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh \n \
+autoload -Uz colors \n \
+colors \n \
+autoload -Uz compinit \n \
+compinit \n \
+setopt share_history \n \
+setopt histignorealldups \n \
+setopt auto_cd \n \
+setopt auto_pushd \n \
+setopt pushd_ignore_dups \n \
+setopt correct \n \
+PROMPT="%(?.%{${fg[green]}%}.%{${fg[red]}%})%n${reset_color}@${fg[blue]}kolla-ansible${reset_color}(%*%) %~ %# " \
+'>> /root/.zshrc
+
 
 ADD kolla-ansible /kolla-ansible
 
-RUN curl https://bootstrap.pypa.io/get-pip.py |python - && \
-    pip install --upgrade pip && \
-    pip install -r /kolla-ansible/requirements.txt && \
+RUN pip install -r /kolla-ansible/requirements.txt && \
     pip install ansible
 
 ADD ssh-config /root/.ssh
@@ -36,6 +56,7 @@ RUN cp /scripts/* /bin/ && \
     chmod +x /bin/inwin
 
 
+ENV TERM=xterm-256color
 
 
 CMD ["/bin/sleep", "infinity"]
