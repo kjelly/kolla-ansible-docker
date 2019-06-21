@@ -28,7 +28,7 @@ setopt auto_cd \n \
 setopt auto_pushd \n \
 setopt pushd_ignore_dups \n \
 setopt correct \n \
-PROMPT="%(?.%{${fg[green]}%}.%{${fg[red]}%})%n${reset_color}@${fg[blue]}kolla-ansible${reset_color}(%*%) %~ %# " \
+PROMPT="%(?.%{${fg[green]}%}.%{${fg[red]}%})%n${reset_color}@${fg[blue]}kolla-ansible${reset_color} %~ %# " \
 '>> /root/.zshrc
 
 ADD kolla-ansible /kolla-ansible
