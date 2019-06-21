@@ -45,6 +45,7 @@ ADD inventory /inventory
 ADD scripts /scripts
 
 RUN cp /scripts/* /bin/ && \
+    cp /usr/bin/python2.7 /usr/bin/python && \
     mv /bin/deploy.sh /bin/ka && \
     mv /bin/kolla_prepare.sh /bin/prepare && \
     mv /bin/inwin.sh /bin/inwin && \
@@ -54,13 +55,7 @@ RUN cp /scripts/* /bin/ && \
     chmod +x /bin/post_add_compute_node && \
     chmod +x /bin/inwin
 
-<<<<<<< HEAD
-
 ENV TERM=xterm-256color
 
-
-=======
-ENV TERM xterm-256color
->>>>>>> 6083c20ae25d93c0e7f96c6513e67a289ce7d71c
 CMD ["/bin/sleep", "infinity"]
 
