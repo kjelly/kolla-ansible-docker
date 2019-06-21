@@ -1,19 +1,18 @@
 FROM ubuntu:18.04
 MAINTAINER Kuo-tung Kao
 
-
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python2.7-dev sudo man-db iputils-ping net-tools iproute2 build-essential zsh wget && \
+    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python2.7-dev sudo man-db iputils-ping net-tools iproute2 build-essential zsh wget
+
+RUN cp /usr/bin/python2.7 /usr/bin/python && \
     curl https://bootstrap.pypa.io/get-pip.py |python - && \
     pip install --upgrade pip && \
     pip install python-openstackclient python-heatclient gnocchiclient
-
 
 RUN wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh | bash && \
     wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh | bash && \
     wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash  && \
     nvim.nightly +PlugInstall +qall! || echo ok
-
 
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 
@@ -45,7 +44,6 @@ ADD inventory /inventory
 ADD scripts /scripts
 
 RUN cp /scripts/* /bin/ && \
-    cp /usr/bin/python2.7 /usr/bin/python && \
     mv /bin/deploy.sh /bin/ka && \
     mv /bin/kolla_prepare.sh /bin/prepare && \
     mv /bin/inwin.sh /bin/inwin && \
