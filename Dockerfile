@@ -13,7 +13,7 @@ RUN cp /usr/bin/python2.7 /usr/bin/python && \
 RUN wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh | bash && \
     wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh | bash && \
     wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash  && \
-    nvim.nightly +PlugInstall +qall! || echo ok
+    nvim +PlugInstall +qall!
 
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 
