@@ -2,37 +2,56 @@
   hosts: "all"
   tasks:
 
-  - copy: src=/etc/kolla-ansible-docker/rename_rules.json dest=/tmp/rename_rules.json
-  - script: /kolla-prepare/udev_interface_bind.py /tmp/rename_rules.json
+  - name: copy rename_rules file
+    copy: src=/etc/kolla-ansible-docker/rename_rules.json dest=/tmp/rename_rules.json
+    ignore_errors: yes
+  - name: run udev interface bind
+    script: /kolla-prepare/udev_interface_bind.py /tmp/rename_rules.json
+    ignore_errors: yes
 
-  - copy: src=/kolla-prepare/inwin-post-boot.service dest=/etc/systemd/system/
-  - file: path=/opt/InwinSTACK/ state=directory
-  - file: path=/etc/inwin/post-boot-scripts state=directory
-  - copy: src=/kolla-prepare/inwin-post-boot.py dest=/opt/InwinSTACK/ mode=0755
-  - copy: src=/kolla-prepare/ifup.py dest=/opt/InwinSTACK/ mode=0755
+  - name: copy inwin-post-boot.servic efile
+    copy: src=/kolla-prepare/inwin-post-boot.service dest=/etc/systemd/system/
+  - name: create dir
+    file: path=/opt/InwinSTACK/ state=directory
+  - name: create dir
+    file: path=/etc/inwin/post-boot-scripts state=directory
+  - name: copy file
+    copy: src=/kolla-prepare/inwin-post-boot.py dest=/opt/InwinSTACK/ mode=0755
+  - name: copy file
+    copy: src=/kolla-prepare/ifup.py dest=/opt/InwinSTACK/ mode=0755
 
-  - shell: systemctl enable inwin-post-boot.service
+  - name: systemctl enable inwin-post-boot.service
+    shell: systemctl enable inwin-post-boot.service
     become: yes
 
-  - copy: src=/packages/ dest=/packages/ mode=0755
+  - name: copy packages
+    copy: src=/packages/ dest=/packages/ mode=0755
 
-  - shell: ./pip-install-offlline.py
+  - name: run pip install offlline
+    shell: ./pip-install-offlline.py
     args:
         chdir: /packages/rocky/pip-packages/
 
+  - name: check if docker exist
+    stat:
+      path: /bin/docker
+    register: docker_binary
+
   - name: install docker
     yum: name={{ item }} state=present
-    when: ansible_os_family == "RedHat"
+    when: ansible_os_family == "RedHat" and docker_binary.stat.exists == False
     with_items:
         - /packages/ocata/docker-engine-selinux-1.13.1-1.el7.centos.noarch.rpm
         - /packages/ocata/docker-engine-1.12.0-1.el7.centos.x86_64.rpm
         - /packages/ocata/deltarpm-3.6-3.el7.x86_64.rpm
 
+  - name: Don't use dns for sshd
+    lineinfile: path=/etc/ssh/sshd_config line="UseDNS no"
+  - name: restart sshd
+    systemd: name="sshd" state="restarted" daemon_reload=yes
 
-  - lineinfile: path=/etc/ssh/sshd_config line="UseDNS no"
-  - systemd: name="sshd" state="restarted" daemon_reload=yes
-
-  - yum: name="{{ item }}" state="absent"
+  - name: remove openvswitch and libvirt
+    yum: name="{{ item }}" state="absent"
     with_items:
     - libvirt-daemon
     - openvswitch
@@ -56,10 +75,12 @@
   - name: disable auto update hostname
     lineinfile: path=/etc/cloud/cloud.cfg  regexp='(- set_hostname)' line="#\1" backrefs=yes
     become: yes
+    ignore_errors: True
 
   - name: disable auto update hostname
     lineinfile: path=/etc/cloud/cloud.cfg  regexp='(- update_hostname)' line="#\1" backrefs=yes
     become: yes
+    ignore_errors: True
 
 
   - name: Generate /etc/hosts for all of the nodes
@@ -71,3 +92,4 @@
           {{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }} {{ hostvars[host]['ansible_hostname'] }}
             {% endfor %}
     become: True
+    ignore_errors: True
