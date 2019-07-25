@@ -23,7 +23,6 @@ c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc
 # DEPRECATED, the group will be removed in S release of OpenStack,
 # use variable neutron_compute_dvr_mode instead.
 [external-compute]
-compute01
 c1  ansible_connection=ssh ansible_user=ubuntu ansible_ssh_private_key_file=/etc/kolla-ansible-docker/key ansible_become_user=root ansible_become=true validate_certs=False host_key_checking=False ansible_python_interpreter=/usr/bin/python2.7
 
 [compute:children]
