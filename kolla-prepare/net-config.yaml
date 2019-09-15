@@ -1,0 +1,30 @@
+---
+servers:
+  localhost:
+    mapping:
+      nic1: mac1
+      nic2: mac2
+    bonds:
+      - bond_name: bond1
+        bond_mode: 4
+        members:
+          - nic1
+          - nic2
+      - bond_name: bond2
+        bond_mode: 4
+        members:
+          - nic1
+          - nic2
+    vlans:
+      - vlan_id: 123
+        device: bond1
+        ip: test
+      - vlan_id: 123
+        device: bond2
+        ip: test
+  c1:
+    - bond_name: bond1
+      bond_mode: 4
+      vlan_id: 123
+      ip: test
+

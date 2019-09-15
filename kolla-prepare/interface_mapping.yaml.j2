@@ -1,0 +1,9 @@
+---
+{% if servers[inventory_hostname].mapping is defined %}
+
+interface_mapping:
+{% for i in servers[inventory_hostname].mapping %}
+  - {{ i }}: {{ servers[inventory_hostname].mapping[i] }}
+{% endfor %}
+
+{% endif %}
