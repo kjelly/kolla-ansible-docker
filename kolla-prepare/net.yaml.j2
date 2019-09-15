@@ -1,0 +1,51 @@
+network_config:
+
+{% if servers[inventory_hostname].bonds is defined %}
+
+{% for b in servers[inventory_hostname].bonds %}
+
+  - type: linux_bond
+    name: "{{ b.bond_name }}"
+    bonding_options: "mode={{ b.bond_mode }}"
+    members:
+    {% for m in b.members %}
+
+      - type: interface
+        name: "{{ m }}"
+    {% endfor %}
+
+    {% if b.ip is defined %}
+
+    addresses:
+      - ip_netmask: "{{ v.ip }}"
+    {% if v.gateway is defined %}
+    routes:
+      - ip_netmaks: 0.0.0.0/0
+        next_hop: "{{ v.gateway }}"
+        default: true
+    {% endif %}
+
+    {% endif %}
+
+{% endfor %}
+
+{% endif %}
+
+{% if servers[inventory_hostname].vlans is defined %}
+
+{% for v in servers[inventory_hostname].vlans %}
+
+  - type: vlan
+    vlan_id: "{{ v.vlan_id }}"
+    device: "{{ v.device }}"
+    addresses:
+      - ip_netmask: "{{ v.ip }}"
+    {% if v.gateway is defined %}
+    routes:
+      - ip_netmaks: 0.0.0.0/0
+        next_hop: "{{ v.gateway }}"
+        default: true
+    {% endif %}
+{% endfor %}
+
+{% endif %}

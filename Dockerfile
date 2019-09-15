@@ -2,8 +2,9 @@ FROM ubuntu:18.04
 MAINTAINER Kuo-tung Kao
 
 RUN apt-get update && \
-    apt-get install -y --force-yes git fish vim libssl-dev libffi-dev curl python2.7-dev sudo man-db build-essential && \
-    apt-get install -y --force-yes zsh wget mariadb-client influxdb-client iputils-ping net-tools iproute2
+    apt-get install -y --force-yes git fish vim silversearcher-ag zsh wget tmux && \
+    apt-get install -y --force-yes libssl-dev libffi-dev curl python2.7-dev sudo man-db build-essential && \
+    apt-get install -y --force-yes mariadb-client influxdb-client iputils-ping net-tools iproute2
 
 RUN cp /usr/bin/python2.7 /usr/bin/python && \
     curl https://bootstrap.pypa.io/get-pip.py |python - && \
@@ -41,20 +42,24 @@ ADD ssh-config /root/.ssh
 ADD packages /packages
 ADD kolla-prepare /kolla-prepare
 
-ADD inventory /inventory
+ADD inventory_header /inventory_header
 ADD scripts /scripts
 
 RUN cp /scripts/* /bin/ && \
     mv /bin/deploy.sh /bin/ka && \
     mv /bin/kolla_prepare.sh /bin/prepare && \
+    mv /bin/net-config.sh /bin/net-config && \
     mv /bin/inwin.sh /bin/inwin && \
     mv /bin/kolla_post_add_compute_node.sh /bin/post_add_compute_node && \
     chmod +x /bin/ka && \
     chmod +x /bin/prepare && \
     chmod +x /bin/post_add_compute_node && \
-    chmod +x /bin/inwin
+    chmod +x /bin/inwin && \
+    cp /kolla-prepare/ansible.cfg /etc/
 
 ENV TERM=xterm-256color
+
+#ADD ~/.config/nvim/bin /usr/bin
 
 CMD ["/bin/sleep", "infinity"]
 
