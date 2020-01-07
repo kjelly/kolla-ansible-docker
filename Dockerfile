@@ -4,17 +4,19 @@ MAINTAINER Kuo-tung Kao
 RUN apt-get update && \
     apt-get install -y --force-yes git fish vim silversearcher-ag zsh wget tmux && \
     apt-get install -y --force-yes libssl-dev libffi-dev curl python2.7-dev sudo man-db build-essential && \
-    apt-get install -y --force-yes mariadb-client influxdb-client iputils-ping net-tools iproute2
+    apt-get install -y --force-yes mariadb-client influxdb-client iputils-ping net-tools iproute2 ldap-utils
 
 RUN cp /usr/bin/python2.7 /usr/bin/python && \
-    curl https://bootstrap.pypa.io/get-pip.py |python - && \
+    curl https://bootstrap.pypa.io/get-pip.py | python - && \
     pip install --upgrade pip && \
-    pip install python-openstackclient python-heatclient gnocchiclient
+    pip install python-openstackclient python-heatclient gnocchiclient aodhclient osc-placement && \
+    pip install ipython
 
 RUN wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh | bash && \
     wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh | bash && \
-    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash  && \
-    nvim +PlugInstall +qall!
+    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash
+
+RUN nvim +PlugInstall +qall!;ls
 
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 

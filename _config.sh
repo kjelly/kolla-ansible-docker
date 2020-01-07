@@ -9,7 +9,7 @@ fi
 
 sudo docker exec $NAME-ansible-docker cp /kolla-ansible/etc/kolla/globals.yml /etc/kolla/
 sudo docker exec $NAME-ansible-docker cp /kolla-ansible/etc/kolla/passwords.yml /etc/kolla/
-sudo docker exec $NAME-ansible-docker cat /inventory_header /kolla-ansible/ansible/inventory/multinode > /etc/kolla-ansible-docker/inventory
+sudo docker exec $NAME-ansible-docker bash -c "cat /inventory_header /kolla-ansible/ansible/inventory/multinode > /etc/kolla-ansible-docker/inventory"
 sudo docker exec $NAME-ansible-docker mkdir -p /etc/ansible/
 sudo docker exec $NAME-ansible-docker cp /kolla-prepare/ansible.cfg /etc/ansible/
 sudo docker exec $NAME-ansible-docker cp /kolla-prepare/net-config.yaml /etc/kolla-ansible-docker/

@@ -5,20 +5,27 @@
   - name: copy rename_rules file
     copy: src=/etc/kolla-ansible-docker/rename_rules.json dest=/tmp/rename_rules.json
     ignore_errors: yes
+    become: yes
   - name: run udev interface bind
     script: /kolla-prepare/udev_interface_bind.py /tmp/rename_rules.json
     ignore_errors: yes
+    become: yes
 
   - name: copy inwin-post-boot.servic efile
     copy: src=/kolla-prepare/inwin-post-boot.service dest=/etc/systemd/system/
+    become: yes
   - name: create dir
     file: path=/opt/InwinSTACK/ state=directory
+    become: yes
   - name: create dir
     file: path=/etc/inwin/post-boot-scripts state=directory
+    become: yes
   - name: copy file
     copy: src=/kolla-prepare/inwin-post-boot.py dest=/opt/InwinSTACK/ mode=0755
+    become: yes
   - name: copy file
     copy: src=/kolla-prepare/ifup.py dest=/opt/InwinSTACK/ mode=0755
+    become: yes
 
   - name: systemctl enable inwin-post-boot.service
     shell: systemctl enable inwin-post-boot.service
@@ -34,35 +41,43 @@
     - docker-engine
     when: ansible_os_family == "RedHat"
     ignore_errors: yes
+    become: yes
 
   - name: copy packages
     copy: src=/packages/ dest=/packages/ mode=0755
+    become: yes
 
   - name: Check pip is installed
     shell: command -v pip >/dev/null 2>&1
     register: is_pip_exist
     ignore_errors: yes
+    become: yes
 
   - name: install pip
     shell: python pip-19.2.3-py2.py3-none-any.whl/pip install --no-index pip-19.2.3-py2.py3-none-any.whl
     args:
       chdir: /packages/
     when: is_pip_exist.rc == 1
+    become: yes
 
   - name: run pip install offlline
     shell: ./pip-install-offlline.py
     args:
         chdir: /packages/rocky/pip-packages/
+    become: yes
 
   - name: install docker
     shell: ./install-docker.sh
     args:
       chdir: /packages/
+    become: yes
 
   - name: Don't use dns for sshd
     lineinfile: path=/etc/ssh/sshd_config line="UseDNS no"
+    become: yes
   - name: restart sshd
     systemd: name="sshd" state="restarted" daemon_reload=yes
+    become: yes
 
   - name: Gather facts
     setup:
