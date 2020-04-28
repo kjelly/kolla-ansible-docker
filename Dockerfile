@@ -3,20 +3,27 @@ MAINTAINER Kuo-tung Kao
 
 RUN apt-get update && \
     apt-get install -y --force-yes git fish vim silversearcher-ag zsh wget tmux && \
-    apt-get install -y --force-yes libssl-dev libffi-dev curl python2.7-dev sudo man-db build-essential && \
-    apt-get install -y --force-yes mariadb-client influxdb-client iputils-ping net-tools iproute2 ldap-utils
+    apt-get install -y --force-yes libssl-dev libffi-dev curl python2.7-dev sudo man-db build-essential python3-dev&& \
+    apt-get install -y --force-yes mariadb-client influxdb-client iputils-ping net-tools iproute2 ldap-utils ipmitool libguestfs-tools oz
 
-RUN cp /usr/bin/python2.7 /usr/bin/python && \
-    curl https://bootstrap.pypa.io/get-pip.py | python - && \
+RUN cp /usr/bin/python3 /usr/bin/python && \
+    curl https://bootstrap.pypa.io/get-pip.py | python2.7  - && \
+    curl https://bootstrap.pypa.io/get-pip.py | python3 - && \
     pip install --upgrade pip && \
-    pip install python-openstackclient python-heatclient gnocchiclient aodhclient osc-placement && \
+    pip install python-openstackclient python-heatclient gnocchiclient aodhclient osc-placement python-ironicclient && \
     pip install ipython
 
-RUN wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh | bash && \
-    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh | bash && \
-    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh |bash
 
-RUN nvim +PlugInstall +qall!;ls
+RUN python2.7 -m pip install pynvim ansible; python3 -m pip install pynvim ansible;
+
+RUN git clone https://github.com/kjelly/auto_config /auto_config ; \
+    cd /auto_config ; echo {}|./nrun.py -r developer-packages fish vim -a deploy; ls
+
+RUN wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim_nightly.sh | bash ; \
+    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvim.sh | bash ; \
+    wget -qO- https://raw.githubusercontent.com/kjelly/auto_config/master/scripts/init_nvimrc.sh | bash ; \
+    nvim --headless "+silent! PlugInstall" +qall; ls
+
 
 RUN git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
 
@@ -60,6 +67,9 @@ RUN cp /scripts/* /bin/ && \
     cp /kolla-prepare/ansible.cfg /etc/
 
 ENV TERM=xterm-256color
+
+COPY nvim.tar.gz /root/
+RUN tar zxvf /root/nvim.tar.gz -C /root/;mkdir -p /root/.vim;
 
 #ADD ~/.config/nvim/bin /usr/bin
 
