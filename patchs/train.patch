@@ -1,0 +1,222 @@
+diff --git a/ansible/library/bslurp.py b/ansible/library/bslurp.py
+index a59c769c4..687a4bc11 100644
+--- a/ansible/library/bslurp.py
++++ b/ansible/library/bslurp.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright 2015 Sam Yaple
+ #
+diff --git a/ansible/library/kolla_ceph_keyring.py b/ansible/library/kolla_ceph_keyring.py
+index ba61d36e9..36d892f48 100644
+--- a/ansible/library/kolla_ceph_keyring.py
++++ b/ansible/library/kolla_ceph_keyring.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright 2018 99cloud
+ #
+diff --git a/ansible/library/kolla_container_facts.py b/ansible/library/kolla_container_facts.py
+index 0e0c9b427..589755104 100644
+--- a/ansible/library/kolla_container_facts.py
++++ b/ansible/library/kolla_container_facts.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright 2016 99cloud
+ #
+diff --git a/ansible/library/kolla_docker.py b/ansible/library/kolla_docker.py
+index fe0264c38..52cb20690 100644
+--- a/ansible/library/kolla_docker.py
++++ b/ansible/library/kolla_docker.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright 2015 Sam Yaple
+ #
+diff --git a/ansible/library/kolla_toolbox.py b/ansible/library/kolla_toolbox.py
+index 276661df2..dd42b760a 100644
+--- a/ansible/library/kolla_toolbox.py
++++ b/ansible/library/kolla_toolbox.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ # Copyright 2016 99cloud Inc.
+ #
+diff --git a/ansible/roles/baremetal/tasks/install.yml b/ansible/roles/baremetal/tasks/install.yml
+index 3e7cbb1ff..c927c1d37 100644
+--- a/ansible/roles/baremetal/tasks/install.yml
++++ b/ansible/roles/baremetal/tasks/install.yml
+@@ -1,9 +1,4 @@
+ ---
+-- name: Update apt cache
+-  apt:
+-    update_cache: yes
+-  become: True
+-  when: ansible_os_family == 'Debian'
+ 
+ # TODO(inc0): Gates don't seem to have ufw executable, check for it instead of ignore errors
+ - name: Set firewall default policy
+@@ -46,33 +41,6 @@
+   changed_when: false
+   register: running_containers
+ 
+-- name: Install apt packages
+-  package:
+-    name: "{{ (debian_pkg_install | join(' ')).split() }}"
+-    state: present
+-  become: True
+-  when: ansible_os_family == 'Debian'
+-  register: apt_install_result
+-
+-- name: Install deltarpm packages
+-  vars:
+-    package_name: "{{ 'deltarpm' if ansible_distribution_major_version == '7' else 'drpm' }}"
+-  package:
+-    name: "{{ package_name }}"
+-    state: present
+-    update_cache: yes
+-  become: True
+-  when: ansible_os_family == 'RedHat'
+-
+-- name: Install RPM packages
+-  package:
+-    name: "{{ (redhat_pkg_install | join(' ')).split() }}"
+-    state: present
+-    update_cache: yes
+-  become: True
+-  when: ansible_os_family == 'RedHat'
+-  register: rpm_install_result
+-
+ # If any packages were updated, and any containers were running, wait for the
+ # daemon to come up and start all previously running containers.
+ 
+@@ -99,39 +67,11 @@
+       command: "docker start {{ running_containers.stdout }}"
+       become: true
+   when:
+-    - install_result is changed
+     - running_containers.rc == 0
+     - running_containers.stdout != ''
+   vars:
+     install_result: "{{ rpm_install_result if ansible_os_family == 'RedHat' else apt_install_result }}"
+ 
+-- name: Install pip
+-  easy_install:
+-    name: pip
+-    virtualenv: "{{ virtualenv is none | ternary(omit, virtualenv) }}"
+-    virtualenv_site_packages: "{{ virtualenv is none | ternary(omit, virtualenv_site_packages) }}"
+-  become: True
+-  when: easy_install_available
+-
+-- name: Install latest pip in the virtualenv
+-  pip:
+-    name: pip
+-    state: latest
+-    virtualenv: "{{ virtualenv }}"
+-    virtualenv_site_packages: "{{ virtualenv_site_packages }}"
+-    virtualenv_python: "python{{ host_python_version }}"
+-  become: True
+-  when: virtualenv is not none
+-
+-- name: Install docker SDK for python
+-  pip:
+-    name: docker
+-    executable: "{{ virtualenv is none | ternary('pip' ~ host_python_major_version, omit) }}"
+-    virtualenv: "{{ virtualenv is none | ternary(omit, virtualenv) }}"
+-    virtualenv_site_packages: "{{ virtualenv is none | ternary(omit, virtualenv_site_packages) }}"
+-    virtualenv_python: "{{ virtualenv is none | ternary(omit, 'python' ~ host_python_version) }}"
+-  become: True
+-
+ - name: Remove packages
+   package:
+     name: "{{ (ubuntu_pkg_removals | join(' ')).split() }}"
+diff --git a/ansible/roles/baremetal/tasks/pre-install.yml b/ansible/roles/baremetal/tasks/pre-install.yml
+index 44c8b1692..bf08b4806 100644
+--- a/ansible/roles/baremetal/tasks/pre-install.yml
++++ b/ansible/roles/baremetal/tasks/pre-install.yml
+@@ -74,79 +74,3 @@
+   become: True
+   when: create_kolla_user | bool
+ 
+-- block:
+-    - block:
+-        - name: Install apt packages
+-          apt:
+-            update_cache: yes
+-          become: True
+-
+-        - name: Install ca certs
+-          package:
+-            name: "{{ item }}"
+-            state: latest
+-          become: True
+-          with_items:
+-            - ca-certificates
+-            - apt-transport-https
+-
+-        - name: Ensure apt sources list directory exists
+-          file:
+-            path: /etc/apt/sources.list.d
+-            state: directory
+-            recurse: yes
+-          become: True
+-
+-        - name: Install docker apt gpg key
+-          apt_key:
+-            url: "{{ docker_apt_url }}/{{ docker_apt_key_file }}"
+-            id: "{{ docker_apt_key_id }}"
+-            state: present
+-          become: True
+-
+-        - name: Enable docker apt repository
+-          apt_repository:
+-            repo: "{{ docker_apt_repo }}"
+-            filename: docker
+-          become: True
+-      when: ansible_os_family == 'Debian'
+-
+-    - block:
+-        - name: Ensure yum repos directory exists
+-          file:
+-            path: /etc/yum.repos.d/
+-            state: directory
+-            recurse: yes
+-          become: True
+-
+-        - name: Enable docker yum repository
+-          yum_repository:
+-            name: docker
+-            description: Docker main Repository
+-            baseurl: "{{ docker_yum_baseurl }}"
+-            gpgcheck: "{{ docker_yum_gpgcheck | bool }}"
+-            gpgkey: "{{ docker_yum_gpgkey }}"
+-          become: True
+-
+-        # NOTE(yoctozepto): above cannot set this but we require it
+-        # to install containerd.io due to runc being a modular package
+-        # in CentOS 8
+-        # see: https://bugzilla.redhat.com/show_bug.cgi?id=1734081
+-        - name: Ensure module_hotfixes enabled for docker
+-          lineinfile:
+-            dest: /etc/yum.repos.d/docker.repo
+-            regexp: "^module_hotfixes"
+-            line: "module_hotfixes = True"
+-            state: present
+-          become: True
+-          when:
+-            - ansible_distribution_major_version == '8'
+-
+-        - name: Install docker rpm gpg key
+-          rpm_key:
+-            state: present
+-            key: "{{ docker_yum_url }}/gpg"
+-          become: True
+-          when: docker_yum_gpgcheck | bool
+-      when: ansible_os_family == 'RedHat'
+-  when: enable_docker_repo | bool

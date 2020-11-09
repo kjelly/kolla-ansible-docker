@@ -1,5 +1,7 @@
 - name: prepare kolla
   hosts: "all"
+  vars:
+    python_interpreter: python3
   tasks:
 
   - name: copy rename_rules file
@@ -48,16 +50,26 @@
     become: yes
 
   - name: Check pip is installed
-    shell: command -v pip >/dev/null 2>&1
+    shell: "{{ python_interpreter }} -m pip"
     register: is_pip_exist
     ignore_errors: yes
     become: yes
 
   - name: install pip
-    shell: python pip-19.2.3-py2.py3-none-any.whl/pip install --no-index pip-19.2.3-py2.py3-none-any.whl
+    shell: "{{ python_interpreter }} pip-19.2.3-py2.py3-none-any.whl/pip install --no-index pip-19.2.3-py2.py3-none-any.whl"
     args:
       chdir: /packages/
     when: is_pip_exist.rc == 1
+    become: yes
+
+  - name: pip install virtualenv
+    shell: "{{ python_interpreter }} -m pip install /packages/rocky/pip-packages/virtualenv-16.7.6-py2.py3-none-any.whl"
+    args:
+      chdir: /packages/
+    become: yes
+
+  - name: create virtualenv
+    shell: "{{ python_interpreter }} -m virtualenv /venv"
     become: yes
 
   - name: run pip install offlline
@@ -71,6 +83,22 @@
     args:
       chdir: /packages/
     become: yes
+
+  - name: start docker
+    systemd: name=docker state=started enabled=yes
+    become: yes
+
+  - name: copy docker daemon.json
+    copy: src=daemon.json dest=/etc/docker/daemon.json
+    become: yes
+    register: docker_daemon
+    ignore_errors: yes
+
+  - name: restart docker
+    shell: systemctl restart docker
+    when: docker_daemon.changed
+    become: yes
+    ignore_errors: yes
 
   - name: Don't use dns for sshd
     lineinfile: path=/etc/ssh/sshd_config line="UseDNS no"
